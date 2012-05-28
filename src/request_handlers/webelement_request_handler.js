@@ -87,12 +87,10 @@ ghostdriver.WebElementReqHand = function(id, session) {
     },
 
     _getDisplayedCommand = function(req, res) {
-          // FIXME calculate the displayed value properly!
-//        var displayed = _session.getCurrentWindow().evaluate(function() {
-//            
-//        });
-          var displayed = true;
-          res.success(_session.getId(), displayed);
+        var isDisplayedAtom = require("./webdriver_atoms.js").get("is_displayed");
+        var displayed = _session.getCurrentWindow().evaluate(isDisplayedAtom, _getJSON());
+        displayed = JSON.parse(displayed).value;
+        res.success(_session.getId(), displayed);
         // TODO handle StaleElementReference
     },
 
