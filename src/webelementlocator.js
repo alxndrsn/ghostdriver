@@ -80,6 +80,11 @@ ghostdriver.WebElementLocator = function(session) {
         return null;    // TODO Handle unsupported locator strategy error
     },
 
+    _locateElements = function(locator, parent_element) {
+        // TODO try to locate the elements ;¬)
+        return [];
+    },
+
     _getElement = function(id) {
         if (typeof(_elements[id]) !== "undefined") {
             return _elements[id];
@@ -90,6 +95,7 @@ ghostdriver.WebElementLocator = function(session) {
     // public:
     return {
         locateElement : _locateElement,
+        locateElements : _locateElements,
         getElement : _getElement
     };
 };

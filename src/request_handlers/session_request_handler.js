@@ -95,8 +95,9 @@ ghostdriver.SessionReqHand = function(session) {
         } else if (req.urlParsed.path.indexOf(_const.ELEMENT_DIR) === 0) {              //< ".../element/:elementId/COMMAND"
             console.log("element directory handling...");
             // Get the WebElementRH and, if found, re-route request to it
+            console.log("Looking for WebElement request handler...");
             element = _locator.getElement(decodeURIComponent(req.urlParsed.chunks[1]));
-            console.log("...found element=" + element);
+            console.log("Found request handler: " + element);
             if (element !== null) {
                 _protoParent.reroute.call(element, req, res, _const.ELEMENT_DIR + req.urlParsed.chunks[1]);
             } else {

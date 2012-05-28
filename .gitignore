@@ -15,3 +15,4 @@ build
 # vim temp files
 *.swp
 *.swo
+*.orig
