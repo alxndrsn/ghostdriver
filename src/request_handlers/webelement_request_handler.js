@@ -37,7 +37,8 @@ ghostdriver.WebElementReqHand = function(id, session) {
     _const = {
         VALUE           : "value",
         SUBMIT          : "submit",
-        ELEMENTS        : "elements"
+        ELEMENTS        : "elements",
+        DISPLAYED       : "displayed"
     },
     _errors = require("./errors.js"),
 
@@ -54,6 +55,9 @@ ghostdriver.WebElementReqHand = function(id, session) {
             return;
         } else if (req.urlParsed.file === _const.ELEMENTS && req.method === "POST") {
             _postElementsCommand(req, res);
+            return;
+        } else if (req.urlParsed.file === _const.DISPLAYED && req.method === "GET") {
+            _getDisplayedCommand(req, res);
             return;
         } // else ...
 
@@ -82,6 +86,16 @@ ghostdriver.WebElementReqHand = function(id, session) {
         throw _errors.createInvalidReqMissingCommandParameterEH(req);
     },
 
+    _getDisplayedCommand = function(req, res) {
+          // FIXME calculate the displayed value properly!
+//        var displayed = _session.getCurrentWindow().evaluate(function() {
+//            
+//        });
+          var displayed = true;
+          res.success(_session.getId(), displayed);
+        // TODO handle StaleElementReference
+    },
+
     _submitCommand = function(req, res) {
         var submitRes,
             submitAtom = require("./webdriver_atoms.js").get("submit");
@@ -106,13 +120,9 @@ ghostdriver.WebElementReqHand = function(id, session) {
         // TODO should handle XPathLookupError - probably an exception will be thrown by the locator
         console.log("_postElementsCommand() :: locating elements...");
         var elements = _locator.locateElements(JSON.parse(req.post));
-        console.log("_postElementsCommand() :: got elements:" + elements);
+        console.log("_postElementsCommand() :: got elements (JSON string):" + JSON.stringify(elements));
 
-        var elementArray = [];
-        for(i=0;i<elements.length;++i) {
-            elementArray.push(elements[i].getJSON());
-        }
-        res.success(_session.getId(), elementArray);
+        res.success(_session.getId(), elements);
     },
 
     _getJSON = function() {

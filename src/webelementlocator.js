@@ -81,15 +81,38 @@ ghostdriver.WebElementLocator = function(session) {
     },
 
     _locateElements = function(locator, parent_element) {
-        // TODO try to locate the elements ;¬)
-        return [];
+        // FIXME this gets any elements rather than just sub-elements
+        var findElementsAtom = require("./webdriver_atoms.js").get("find_elements");
+        if (locator && locator.using && locator.value &&         //< if well-formed input
+            _supportedStrategies.indexOf(locator.using) >= 0) {  //< and if strategy is recognized
+
+            // Use Atom "find_result" to search for element in the page
+            findElementRes = _session.getCurrentWindow().evaluate(findElementsAtom, locator.using, locator.value);
+            console.log("findElementRes=" + findElementRes);
+
+            // De-serialise the result of the Atom execution
+            try {
+                findElementRes = JSON.parse(findElementRes);
+            } catch (e) {
+                console.error("Invalid locator received: "+JSON.stringify(locator));
+                return null;
+            }
+
+            // TODO add request handlers for elements
+
+            return findElementRes.value;
+        }
+
+        // Not found because of invalid Locator
+        return null;    // TODO Handle unsupported locator strategy error
     },
 
     _getElement = function(id) {
-        if (typeof(_elements[id]) !== "undefined") {
-            return _elements[id];
+        // have changed this to create elements lazily as it saves a lot of hassle
+        if (typeof(_elements[id]) === "undefined") {
+            _elements[id] = new ghostdriver.WebElementReqHand(id, _session);
         }
-        return null;
+        return _elements[id];
     };
 
     // public:
