@@ -42,14 +42,9 @@ ghostdriver.StatusReqHand = function() {
             "time"      : "unknown"
         },
         "os" : {
-            // This breaks on my machine - 'os' is undefined
-            //"name"      : ghostdriver.system.os.name,
-            //"version"   : ghostdriver.system.os.version,
-            //"arch"      : ghostdriver.system.os.architecture
-            // From previous GD:
-            "arch" : "x86",
-            "name" : "osx",
-            "version" : "10.7.2"
+            "name"      : ghostdriver.system.os.name,
+            "version"   : ghostdriver.system.os.version,
+            "arch"      : ghostdriver.system.os.architecture
         }
     };
 
