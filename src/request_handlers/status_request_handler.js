@@ -26,25 +26,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 var ghostdriver = ghostdriver || {};
+// On my machine, the following prints:
+//StatusReqHand :: Ghostdriver.system=System(name = "")
+//StatusReqHand :: Ghostdriver.system.os=undefined
+console.log("StatusReqHand :: Ghostdriver.system=" + ghostdriver.system);
+console.log("StatusReqHand :: Ghostdriver.system.os=" + ghostdriver.system.os);
 
 ghostdriver.StatusReqHand = function() {
     // private:
-    var
-    _protoParent = ghostdriver.StatusReqHand.prototype,
-    _statusObj = {
+    var _protoParent = ghostdriver.StatusReqHand.prototype;
+    var _statusObj = {
         "build" : {
             "version"   : "1.0-dev",
             "revision"  : "unknown",
             "time"      : "unknown"
         },
         "os" : {
-            "name"      : ghostdriver.system.os.name,
-            "version"   : ghostdriver.system.os.version,
-            "arch"      : ghostdriver.system.os.architecture
+            // This breaks on my machine - 'os' is undefined
+            //"name"      : ghostdriver.system.os.name,
+            //"version"   : ghostdriver.system.os.version,
+            //"arch"      : ghostdriver.system.os.architecture
+            // From previous GD:
+            "arch" : "x86",
+            "name" : "osx",
+            "version" : "10.7.2"
         }
-    },
+    };
 
-    _handle = function(req, res) {
+    var _handle = function(req, res) {
         _protoParent.handle.call(this, req, res);
 
         if (req.method === "GET" && req.urlParsed.file === "status") {
