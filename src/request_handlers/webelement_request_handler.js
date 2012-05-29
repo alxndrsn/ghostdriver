@@ -38,7 +38,9 @@ ghostdriver.WebElementReqHand = function(id, session) {
         VALUE           : "value",
         SUBMIT          : "submit",
         ELEMENTS        : "elements",
-        DISPLAYED       : "displayed"
+        DISPLAYED       : "displayed",
+        ATTRIBUTE_DIR   : "/attribute/",
+        NAME            : "name"
     },
     _errors = require("./errors.js"),
 
@@ -46,6 +48,7 @@ ghostdriver.WebElementReqHand = function(id, session) {
         _protoParent.handle.call(this, req, res);
 
         // TODO lots to do...
+console.log("urlParsed: " + req.urlParsed);
 
         if (req.urlParsed.file === _const.VALUE && req.method === "POST") {
             _valueCommand(req, res);
@@ -58,6 +61,12 @@ ghostdriver.WebElementReqHand = function(id, session) {
             return;
         } else if (req.urlParsed.file === _const.DISPLAYED && req.method === "GET") {
             _getDisplayedCommand(req, res);
+            return;
+        } else if (req.urlParsed.path.indexOf(_const.ATTRIBUTE_DIR) != -1 && req.method === "GET") {
+            _getAttributeCommand(req, res);
+            return;
+        } else if (req.urlParsed.file === _const.NAME && req.method === "GET") {
+            _getNameCommand(req, res);
             return;
         } // else ...
 
@@ -86,12 +95,26 @@ ghostdriver.WebElementReqHand = function(id, session) {
         throw _errors.createInvalidReqMissingCommandParameterEH(req);
     },
 
+    _getNameCommand = function(req, res) {
+        // TODO need to extract the name of the element from the DOM.  How do we get a proper handle on the
+        // DOM element instead of the WebDriver element?
+        res.success(_session.getId(), "not-really-the-right-name");
+    },
+
+    _getAttributeCommand = function(req, res) {
+        var attributeName = req.urlParsed.file;
+console.log("Getting attribute: " + attributeName);
+        var attributeValueAtom = require("./webdriver_atoms.js").get("get_attribute_value");
+        var attributeValue = _session.getCurrentWindow().evaluate(attributeValueAtom, _getJSON(), attributeName);
+        attributeValue = JSON.parse(attributeValue).value;
+console.log("Attribute value: " + attributeValue);
+        res.success(_session.getId(), attributeValue);
+    },
+
     _getDisplayedCommand = function(req, res) {
         var isDisplayedAtom = require("./webdriver_atoms.js").get("is_displayed");
         var displayed = _session.getCurrentWindow().evaluate(isDisplayedAtom, _getJSON());
-        displayed = JSON.parse(displayed).value;
-        res.success(_session.getId(), displayed);
-        // TODO handle StaleElementReference
+        res.respondBasedOnResult(_session, req, displayed);
     },
 
     _submitCommand = function(req, res) {
