@@ -37,8 +37,8 @@ ghostdriver.WebElementReqHand = function(id, session) {
     _const = {
         VALUE           : "value",
         SUBMIT          : "submit",
-        ELEMENTS        : "elements",
         DISPLAYED       : "displayed",
+        ELEMENTS        : "elements",
         ATTRIBUTE_DIR   : "/attribute/",
         NAME            : "name"
     },
@@ -55,11 +55,11 @@ ghostdriver.WebElementReqHand = function(id, session) {
         } else if (req.urlParsed.file === _const.SUBMIT && req.method === "POST") {
             _submitCommand(req, res);
             return;
-        } else if (req.urlParsed.file === _const.ELEMENTS && req.method === "POST") {
-            _postElementsCommand(req, res);
-            return;
         } else if (req.urlParsed.file === _const.DISPLAYED && req.method === "GET") {
             _getDisplayedCommand(req, res);
+            return;
+        } else if (req.urlParsed.file === _const.ELEMENTS && req.method === "POST") {
+            _postElementsCommand(req, res);
             return;
         } else if (req.urlParsed.path.indexOf(_const.ATTRIBUTE_DIR) != -1 && req.method === "GET") {
             _getAttributeCommand(req, res);
@@ -111,13 +111,10 @@ ghostdriver.WebElementReqHand = function(id, session) {
     },
 
     _getAttributeCommand = function(req, res) {
-        var attributeName = req.urlParsed.file;
-console.log("Getting attribute: " + attributeName);
         var attributeValueAtom = require("./webdriver_atoms.js").get("get_attribute_value");
-        var attributeValue = _session.getCurrentWindow().evaluate(attributeValueAtom, _getJSON(), attributeName);
-        attributeValue = JSON.parse(attributeValue).value;
-console.log("Attribute value: " + attributeValue);
-        res.success(_session.getId(), attributeValue);
+        var attributeName = req.urlParsed.file;
+        var response = _session.getCurrentWindow().evaluate(attributeValueAtom, _getJSON(), attributeName);
+        res.respondBasedOnResult(_session, req, response);
     },
 
     _submitCommand = function(req, res) {
