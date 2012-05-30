@@ -40,7 +40,9 @@ ghostdriver.WebElementReqHand = function(id, session) {
         DISPLAYED       : "displayed",
         ELEMENTS        : "elements",
         ATTRIBUTE_DIR   : "/attribute/",
-        NAME            : "name"
+        NAME            : "name",
+        TEXT            : "text",
+        EQUALS_DIR      : "/equals/"
     },
     _errors = require("./errors.js"),
 
@@ -66,6 +68,12 @@ ghostdriver.WebElementReqHand = function(id, session) {
             return;
         } else if (req.urlParsed.file === _const.NAME && req.method === "GET") {
             _getNameCommand(req, res);
+            return;
+        } else if (req.urlParsed.file === _const.TEXT && req.method === "GET") {
+            _getTextCommand(req, res);
+            return;
+        } else if (req.urlParsed.path.indexOf(_const.EQUALS_DIR) != -1 && req.method === "GET") {
+            _getEqualsCommand(req, res);
             return;
         } // else ...
 
@@ -115,6 +123,20 @@ ghostdriver.WebElementReqHand = function(id, session) {
         var attributeName = req.urlParsed.file;
         var response = _session.getCurrentWindow().evaluate(attributeValueAtom, _getJSON(), attributeName);
         res.respondBasedOnResult(_session, req, response);
+    },
+
+    _getTextCommand = function(req, res) {
+        var textAtom = require("./webdriver_atoms.js").get("get_text");
+        var response = _session.getCurrentWindow().evaluate(textAtom, _getJSON());
+        res.respondBasedOnResult(_session, req, response);
+    },
+
+    _getEqualsCommand = function(req, res) {
+        // FIXME this currently just reports everything as not equal
+//        var textAtom = require("./webdriver_atoms.js").get("get_");
+//        var response = _session.getCurrentWindow().evaluate(textAtom, _getJSON());
+//        res.respondBasedOnResult(_session, req, response);
+        res.success(_session.getId(), false);
     },
 
     _submitCommand = function(req, res) {
