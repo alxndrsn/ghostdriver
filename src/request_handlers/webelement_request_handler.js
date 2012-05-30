@@ -132,10 +132,11 @@ ghostdriver.WebElementReqHand = function(id, session) {
     },
 
     _getEqualsCommand = function(req, res) {
-        // FIXME this currently just reports everything as not equal
-//        var textAtom = require("./webdriver_atoms.js").get("get_");
-//        var response = _session.getCurrentWindow().evaluate(textAtom, _getJSON());
-//        res.respondBasedOnResult(_session, req, response);
+        // FIXME this appears to work, but I don't know a decent way to test it
+        var result = _session.getCurrentWindow().evaluate(
+            require("./webdriver_atoms.js").get("execute_script"),
+            "return arguments[0].isSameNode(arguments[1]);",
+            [_getJSON(), _getJSON(req.urlParsed.file)]);
         res.success(_session.getId(), false);
     },
 
@@ -168,9 +169,9 @@ ghostdriver.WebElementReqHand = function(id, session) {
         res.success(_session.getId(), elements);
     },
 
-    _getJSON = function() {
+    _getJSON = function(elementId) {
         return {
-            "ELEMENT" : _getId()
+            "ELEMENT" : elementId || _getId()
         };
     },
 
