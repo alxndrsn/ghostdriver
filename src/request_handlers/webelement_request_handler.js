@@ -48,7 +48,6 @@ ghostdriver.WebElementReqHand = function(id, session) {
         _protoParent.handle.call(this, req, res);
 
         // TODO lots to do...
-console.log("urlParsed: " + req.urlParsed);
 
         if (req.urlParsed.file === _const.VALUE && req.method === "POST") {
             _valueCommand(req, res);
@@ -73,6 +72,12 @@ console.log("urlParsed: " + req.urlParsed);
         // TODO lots to do...
 
         throw _errors.createInvalidReqInvalidCommandMethodEH(req);
+    },
+
+    _getDisplayedCommand = function(req, res) {
+        var isDisplayedAtom = require("./webdriver_atoms.js").get("is_displayed");
+        var displayed = _session.getCurrentWindow().evaluate(isDisplayedAtom, _getJSON());
+        res.respondBasedOnResult(_session, req, displayed);
     },
 
     _valueCommand = function(req, res) {
@@ -113,12 +118,6 @@ console.log("Getting attribute: " + attributeName);
         attributeValue = JSON.parse(attributeValue).value;
 console.log("Attribute value: " + attributeValue);
         res.success(_session.getId(), attributeValue);
-    },
-
-    _getDisplayedCommand = function(req, res) {
-        var isDisplayedAtom = require("./webdriver_atoms.js").get("is_displayed");
-        var displayed = _session.getCurrentWindow().evaluate(isDisplayedAtom, _getJSON());
-        res.respondBasedOnResult(_session, req, displayed);
     },
 
     _submitCommand = function(req, res) {
