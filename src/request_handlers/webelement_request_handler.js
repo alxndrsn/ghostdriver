@@ -96,9 +96,13 @@ console.log("urlParsed: " + req.urlParsed);
     },
 
     _getNameCommand = function(req, res) {
-        // TODO need to extract the name of the element from the DOM.  How do we get a proper handle on the
-        // DOM element instead of the WebDriver element?
-        res.success(_session.getId(), "not-really-the-right-name");
+        var result = _session.getCurrentWindow().evaluate(
+            require("./webdriver_atoms.js").get("execute_script"),
+            "return arguments[0].tagName;",
+            [_getJSON()]);
+        // N.B. must convert value to a lowercase string as per WebDriver JSONWireProtocol spec
+        if(result.status === 0) result.value = result.value.toLowerCase();
+        res.respondBasedOnResult(_session, req, result);
     },
 
     _getAttributeCommand = function(req, res) {
