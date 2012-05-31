@@ -1,7 +1,8 @@
 /*
 This file is part of the GhostDriver project from Neustar inc.
 
-Copyright (c) 2012, Ivan De Marino <ivan.de.marino@gmail.com> - Neustar inc. and others.
+Copyright (c) 2012, Ivan De Marino <ivan.de.marino@gmail.com> - Neustar inc.
+Copyright (c) 2012, Alex Anderson <@alxndrsn>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -134,9 +135,7 @@ ghostdriver.SessionReqHand = function(session) {
             return;
         } else if (req.urlParsed.file === _const.COOKIE) {
             if(req.method === "DELETE") {
-                console.log("Handling delete cookie command...");
                 _deleteCookieCommand(req, res);
-                console.log("Cookies deleted.");
                 return;
             }
         }
@@ -345,10 +344,12 @@ ghostdriver.SessionReqHand = function(session) {
 
     _deleteCookieCommand = function(req, res) {
         _session.getCurrentWindow().evaluate(function() {
-            var p = document.cookie.split(";");
-            for(i=p.length-1;i>=0;--i) {
-                var key = p[i].split("=");
-                document.cookie = key + "=";
+            var p = document.cookie.split(";"),
+                i, key;
+
+            for(i = p.length -1; i >= 0; --i) {
+                key = p[i].split("=");
+                document.cookie = key + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
             }
         });
         res.success(_session.getId());
