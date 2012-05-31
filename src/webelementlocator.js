@@ -87,7 +87,7 @@ ghostdriver.WebElementLocator = function(session) {
             _supportedStrategies.indexOf(locator.using) >= 0) {  //< and if strategy is recognized
 
             // Use Atom "find_result" to search for element in the page
-            findElementRes = _session.getCurrentWindow().evaluate(findElementsAtom, locator.using, locator.value);
+            findElementRes = _session.getCurrentWindow().evaluate(findElementsAtom, locator.using, locator.value, parent_element);
             console.log("findElementRes=" + findElementRes);
 
             // De-serialise the result of the Atom execution

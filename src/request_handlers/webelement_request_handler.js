@@ -163,7 +163,7 @@ ghostdriver.WebElementReqHand = function(id, session) {
         // Search for WebElements in this element
         // TODO should handle XPathLookupError - probably an exception will be thrown by the locator
         console.log("_postElementsCommand() :: locating elements...");
-        var elements = _locator.locateElements(JSON.parse(req.post));
+        var elements = _locator.locateElements(JSON.parse(req.post), _getJSON());
         console.log("_postElementsCommand() :: got elements (JSON string):" + JSON.stringify(elements));
 
         res.success(_session.getId(), elements);
