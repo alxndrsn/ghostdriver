@@ -39,11 +39,12 @@ ghostdriver.WebElementReqHand = function(id, session) {
         VALUE           : "value",
         SUBMIT          : "submit",
         DISPLAYED       : "displayed",
-        ATTRIBUTE_DIR   : "/attribute/",
+        ATTRIBUTE       : "attribute",
         NAME            : "name",
         ELEMENTS        : "elements",
         TEXT            : "text",
         EQUALS_DIR      : "/equals/"
+
     },
     _errors = require("./errors.js"),
 
@@ -63,7 +64,7 @@ ghostdriver.WebElementReqHand = function(id, session) {
         } else if (req.urlParsed.file === _const.DISPLAYED && req.method === "GET") {
             _getDisplayedCommand(req, res);
             return;
-        } else if (req.urlParsed.path.indexOf(_const.ATTRIBUTE_DIR) != -1 && req.method === "GET") {
+        } else if (req.urlParsed.chunks[0] === _const.ATTRIBUTE && req.method === "GET") {
             _getAttributeCommand(req, res);
             return;
         } else if (req.urlParsed.file === _const.NAME && req.method === "GET") {
