@@ -50,6 +50,8 @@ ghostdriver.WebElementReqHand = function(id, session) {
     _handle = function(req, res) {
         _protoParent.handle.call(this, req, res);
 
+        // console.log("Request => " + JSON.stringify(req, null, '  '));
+
         // TODO lots to do...
 
         if (req.urlParsed.file === _const.VALUE && req.method === "POST") {
@@ -102,7 +104,40 @@ ghostdriver.WebElementReqHand = function(id, session) {
 
             // TODO - Error handling based on the value of "typeRes"
 
-            res.success();
+            res.success(_session.getId());
+            return;
+        }
+
+        throw _errors.createInvalidReqMissingCommandParameterEH(req);
+    },
+
+    _getNameCommand = function(req, res) {
+        var result = _session.getCurrentWindow().evaluate(
+                require("./webdriver_atoms.js").get("execute_script"),
+                "return arguments[0].tagName;",
+                [_getJSON()]);
+
+        // Convert value to a lowercase string as per WebDriver JSONWireProtocol spec
+        // @see http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/name
+        if(result.status === 0) {
+            result.value = result.value.toLowerCase();
+        }
+
+        res.respondBasedOnResult(_session, req, result);
+    },
+
+    _getAttributeCommand = function(req, res) {
+        var attributeValueAtom = require("./webdriver_atoms.js").get("get_attribute_value"),
+            result;
+
+        if (typeof(req.urlParsed.file) !== "undefined") {
+            // Read the attribute
+            result = _session.getCurrentWindow().evaluate(
+                attributeValueAtom,     // < Atom to read an attribute
+                _getJSON(),             // < Element to read from
+                req.urlParsed.file);    // < Attribute to read
+
+            res.respondBasedOnResult(_session, req, result);
             return;
         }
 
@@ -148,7 +183,7 @@ ghostdriver.WebElementReqHand = function(id, session) {
         // Listen for the page to Finish Loading after the submit
         _getSession().getCurrentWindow().setOneShotCallback("onLoadFinished", function(status) {
             if (status === "success") {
-                res.success();
+                res.success(_session.getId());
             }
 
             // TODO - what do we do if this fails?

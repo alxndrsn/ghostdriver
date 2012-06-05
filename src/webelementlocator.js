@@ -108,9 +108,22 @@ ghostdriver.WebElementLocator = function(session) {
     },
 
     _getElement = function(id) {
-        // have changed this to create elements lazily as it saves a lot of hassle
-        if (typeof(_elements[id]) === "undefined") {
-            _elements[id] = new ghostdriver.WebElementReqHand(id, _session);
+        var el;
+
+        if (typeof(_elements[id]) !== "undefined") {
+            // If element was previously "found"
+            return _elements[id];
+        } else {
+            // Check if the object exists in the page
+            el = _session.getCurrentWindow().evaluate(
+                    require("./webdriver_atoms.js").get("get_element_from_cache"),
+                    id);
+
+            if (typeof(el) === "object") {
+                // The object exists: we are in the safe
+                _elements[id] = new ghostdriver.WebElementReqHand(id, _session);
+                return _elements[id];
+            }
         }
         return _elements[id];
     };
