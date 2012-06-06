@@ -43,8 +43,9 @@ ghostdriver.WebElementReqHand = function(id, session) {
         NAME            : "name",
         ELEMENTS        : "elements",
         TEXT            : "text",
-        EQUALS_DIR      : "/equals/"
-
+        EQUALS          : "equals",
+        CLEAR           : "clear",
+        CSS             : "css"
     },
     _errors = require("./errors.js"),
 
@@ -76,8 +77,14 @@ ghostdriver.WebElementReqHand = function(id, session) {
         } else if (req.urlParsed.file === _const.TEXT && req.method === "GET") {
             _getTextCommand(req, res);
             return;
-        } else if (req.urlParsed.path.indexOf(_const.EQUALS_DIR) != -1 && req.method === "GET") {
+        } else if (req.urlParsed.chunks[0] === _const.EQUALS && req.method === "GET") {
             _getEqualsCommand(req, res);
+            return;
+        } else if (req.urlParsed.file === _const.CLEAR && req.method === "POST") {
+            _postClearCommand(req, res);
+            return;
+        } else if (req.urlParsed.chunks[0] === _const.CSS && req.method === "GET") {
+            _getCssCommand(req, res);
             return;
         } // else ...
 
@@ -110,6 +117,22 @@ ghostdriver.WebElementReqHand = function(id, session) {
         }
 
         throw _errors.createInvalidReqMissingCommandParameterEH(req);
+    },
+
+    _postClearCommand = function(req, res) {
+        var result = _session.getCurrentWindow().evaluate(
+                require("./webdriver_atoms.js").get("clear"),
+                _getJSON());
+        res.respondBasedOnResult(_session, req, result);
+    },
+
+    _getCssCommand = function(req, res) {
+        var result = _session.getCurrentWindow().evaluate(
+                require("./webdriver_atoms.js").get("execute_script"),
+                "return window.getComputedStyle(arguments[0]).getPropertyValue(arguments[1]);",
+                [_getJSON(), req.urlParsed.file]);
+
+        res.respondBasedOnResult(_session, req, result);
     },
 
     _getNameCommand = function(req, res) {
