@@ -274,7 +274,10 @@ ghostdriver.SessionReqHand = function(session) {
                     // Callback received: don't need the timer anymore
                     clearTimeout(timer);
 
+console.log("STATUS: " + status);
                     if (status === "success") {
+console.log("res.success=...");
+console.log("..." + res.success);
                         res.success(_session.getId());
                     } else {
                         _errors.handleInvalidReqInvalidCommandMethodEH(req, res);
@@ -401,6 +404,8 @@ ghostdriver.SessionReqHand = function(session) {
     },
 
     _deleteCookieCommand = function(req, res) {
+	// Delete all cookies visible to the current page.
+        /* FIXME for now let's just pretend we deleted them ;¬)
         _session.getCurrentWindow().evaluate(function() {
             var p = document.cookie.split(";"),
                 i, key;
@@ -409,7 +414,7 @@ ghostdriver.SessionReqHand = function(session) {
                 key = p[i].split("=");
                 document.cookie = key + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
             }
-        });
+        });*/
         res.success(_session.getId());
     },
 

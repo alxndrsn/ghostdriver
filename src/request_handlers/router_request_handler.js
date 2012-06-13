@@ -52,6 +52,7 @@ ghostdriver.RouterReqHand = function() {
         _protoParent.handle.call(this, req, res);
 
         console.log("Request => " + JSON.stringify(req, null, '  '));
+//        console.log("Request.url => [" + req.method + "] " + req.url);
 
         try {
             if (req.urlParsed.file === _const.STATUS) {                             // GET '/status'

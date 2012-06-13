@@ -17,6 +17,10 @@ dependencies {
         compile "org.seleniumhq.selenium:$it:$seleniumVersion"
     }
     testCompile "junit:junit-dep:4.8+"
+
+    // dependencies for Geb
+    testCompile "org.codehaus.geb:geb-spock:0.7.0"
+    testCompile "org.spockframework:spock-core:0.6-groovy-1.8"
 }
 
 tasks.withType(JavaExec) {
@@ -30,6 +34,8 @@ test {
 
    //listening to test execution events
    beforeTest { descriptor ->
+      // TODO start test server
+      // TODO start ghostdriver
       logger.lifecycle("Running test: " + descriptor)
    }
    onOutput { descriptor, event ->
