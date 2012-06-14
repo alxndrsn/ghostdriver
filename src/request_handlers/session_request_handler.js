@@ -289,12 +289,17 @@ console.log("Command: " + command);
         if (typeof(postObj) === "object" && postObj.url) {
             // Open the given URL and, when done, return "HTTP 200 OK"
             _session.getCurrentWindow().open(postObj.url, function(status) {
-                if (!pageOpenTimedout) {
+                if (!pageOpenTimedout && ""+res!="null") {
                     // Callback received: don't need the timer anymore
                     clearTimeout(timer);
 
 console.log("STATUS: " + status);
                     if (status === "success") {
+console.log("res=" + res);
+console.log("res==null?" + (res==null));
+console.log("res===null?" + (res===null));
+if(res) { console.log("evaluates true"); } else { console.log("evaluates false"); }
+console.log("res=" + JSON.stringify(res));
 console.log("res.success=...");
 console.log("..." + res.success);
                         res.success(_session.getId());

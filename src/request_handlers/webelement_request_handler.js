@@ -45,7 +45,8 @@ ghostdriver.WebElementReqHand = function(id, session) {
         TEXT            : "text",
         EQUALS          : "equals",
         CLEAR           : "clear",
-        CSS             : "css"
+        CSS             : "css",
+        CLICK           : "click"
     },
     _errors = require("./errors.js"),
 
@@ -85,6 +86,9 @@ ghostdriver.WebElementReqHand = function(id, session) {
             return;
         } else if (req.urlParsed.chunks[0] === _const.CSS && req.method === "GET") {
             _getCssCommand(req, res);
+            return;
+        } else if (req.urlParsed.file === _const.CLICK && req.method === "POST") {
+            _postClickCommand(req, res);
             return;
         } // else ...
 
@@ -192,7 +196,7 @@ ghostdriver.WebElementReqHand = function(id, session) {
     },
 
     _getEqualsCommand = function(req, res) {
-        // FIXME this appears to work, but I don't know a decent way to test it
+        // TODO this appears to work, but I don't know a decent way to test it
         var result = _session.getCurrentWindow().evaluate(
             require("./webdriver_atoms.js").get("execute_script"),
             "return arguments[0].isSameNode(arguments[1]);",
@@ -227,6 +231,15 @@ ghostdriver.WebElementReqHand = function(id, session) {
         console.log("_postElementsCommand() :: got elements (JSON string):" + JSON.stringify(elements));
 
         res.success(_session.getId(), elements);
+    },
+
+    _postClickCommand = function(req, res) {
+        var clickAtom = require("./webdriver_atoms.js").get("click");
+            result = _session.getCurrentWindow().evaluate(clickAtom, _getJSON());
+console.log("_postClickCommand :: result=" + result);
+        // TODO handle errors
+        //throw _errors.createInvalidReqInvalidCommandMethodEH(req);
+        res.success(_session.getId());
     },
 
     _getJSON = function(elementId) {
