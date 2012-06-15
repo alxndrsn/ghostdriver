@@ -46,7 +46,8 @@ ghostdriver.WebElementReqHand = function(id, session) {
         EQUALS          : "equals",
         CLEAR           : "clear",
         CSS             : "css",
-        CLICK           : "click"
+        CLICK           : "click",
+        SELECTED        : "selected"
     },
     _errors = require("./errors.js"),
 
@@ -89,6 +90,9 @@ ghostdriver.WebElementReqHand = function(id, session) {
             return;
         } else if (req.urlParsed.file === _const.CLICK && req.method === "POST") {
             _postClickCommand(req, res);
+            return;
+        } else if (req.urlParsed.file === _const.SELECTED && req.method === "GET") {
+            _getSelectedCommand(req, res);
             return;
         } // else ...
 
@@ -240,6 +244,19 @@ console.log("_postClickCommand :: result=" + result);
         // TODO handle errors
         //throw _errors.createInvalidReqInvalidCommandMethodEH(req);
         res.success(_session.getId());
+    },
+
+    _getSelectedCommand = function(req, res) {
+        var selectedAtom = require("./webdriver_atoms.js").get("is_selected");
+            result = JSON.parse(_session.getCurrentWindow().evaluate(selectedAtom, _getJSON()));
+        if(result.status === 0) {
+            res.success(_session.getId(), result.value);
+        } else {
+            // spec does not detail which errors to throw, although it is implied
+            // by the response of the atom
+console.log("_getSelectedCommand :: result=" + result);
+            throw _errors.createInvalidReqInvalidCommandMethodEH(req);
+        }
     },
 
     _getJSON = function(elementId) {
