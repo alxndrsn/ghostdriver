@@ -31,6 +31,7 @@ var ghostdriver = ghostdriver || {};
 ghostdriver.SessionReqHand = function(session) {
     // private:
     var
+    _alertMonitor = {displayed:false, keyBuffer:''},
     _protoParent = ghostdriver.SessionReqHand.prototype,
     _session = session,
     _locator = new ghostdriver.WebElementLocator(_session),
@@ -57,7 +58,10 @@ ghostdriver.SessionReqHand = function(session) {
         WINDOW_HANDLES  : "window_handles",
         FRAME           : "frame",
         SOURCE          : "source",
-        COOKIE          : "cookie"
+        COOKIE          : "cookie",
+        ACCEPT_ALERT    : "accept_alert",
+        DISMISS_ALERT   : "dismiss_alert",
+        ALERT_TEXT      : "alert_text"
     },
     _errors = require("./errors.js"),
 
@@ -156,6 +160,18 @@ console.log("Command: " + command);
                 _deleteCookieCommand(req, res);
                 return;
             }
+        } else if (req.urlParsed.file === _const.ACCEPT_ALERT && req.method === "POST") {
+            _postAcceptAlertCommand(req, res);
+            return;
+        } else if (req.urlParsed.file === _const.DISMISS_ALERT && req.method === "POST") {
+            _postDismissAlertCommand(req, res);
+            return;
+        } else if (req.urlParsed.file === _const.ALERT_TEXT && req.method === "GET") {
+            _getAlertTextCommand(req, res);
+            return;
+        } else if (req.urlParsed.file === _const.ALERT_TEXT && req.method === "POST") {
+            _postAlertTextCommand(req, res);
+            return;
         }
 
         throw _errors.createInvalidReqInvalidCommandMethodEH(req);
@@ -167,6 +183,65 @@ console.log("Command: " + command);
         };
     },
 
+    _postAcceptAlertCommand = function(req, res) {
+console.log("_postAcceptAlertCommand :: ENTRY");
+        if(_session.acceptAlert()) {
+            res.success(_session.getId());
+        } else {
+            _errors.handleFailedCommandEH(
+                _errors.FAILED_CMD_STATUS.NO_ALERT_OPEN_ERROR,
+                "what do we say?  there was no alert apparently",
+                req,
+                res,
+                _session,
+                "SessionReqHand");
+        }
+    },
+
+    _postDismissAlertCommand = function(req, res) {
+console.log("_postDismissAlertCommand :: ENTRY");
+        if(_session.dismissAlert()) {
+            res.success(_session.getId());
+        } else {
+            _errors.handleFailedCommandEH(
+                _errors.FAILED_CMD_STATUS.NO_ALERT_OPEN_ERROR,
+                "what do we say?  there was no alert apparently",
+                req,
+                res,
+                _session,
+                "SessionReqHand");
+        }
+    },
+
+    _getAlertTextCommand = function(req, res) {
+        var text = _session.getAlertText();
+console.log("_getAlertTextCommand :: text=" + text);
+        if(text) {
+            res.success(_session.getId(), text);
+        } else {
+            _errors.handleFailedCommandEH(
+                _errors.FAILED_CMD_STATUS.NO_ALERT_OPEN_ERROR,
+                "what do we say?  there was no alert apparently",
+                req,
+                res,
+                _session,
+                "SessionReqHand");
+        }
+    },
+
+    _postAlertTextCommand = function(req, res) {
+        if(_session.sendKeysToAlert(req.text)) {
+            res.success(_session.getId());
+        } else {
+            _errors.handleFailedCommandEH(
+                _errors.FAILED_CMD_STATUS.NO_ALERT_OPEN_ERROR,
+                "what do we say?  there was no alert apparently",
+                req,
+                res,
+                _session,
+                "SessionReqHand");
+        }
+    },
 
     _refreshCommand = function(req, res) {
         var successHand = _createOnSuccessHandler(res);
