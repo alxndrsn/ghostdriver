@@ -43,7 +43,7 @@ ghostdriver.WebElementLocator = function(session) {
     _elements = {},
     _session = session,
 
-    _locateElement = function(locator) {
+    _locateElement = function(locator, parent_element) {
         var elementId,
             findElementAtom = require("./webdriver_atoms.js").get("find_element"),
             findElementRes;
@@ -57,7 +57,8 @@ ghostdriver.WebElementLocator = function(session) {
             findElementRes = _session.getCurrentWindow().evaluate(
                 findElementAtom,
                 locator.using,
-                locator.value);
+                locator.value,
+                parent_element);
 
             // console.log("Find Element Result: "+JSON.stringify(findElementRes));
 
@@ -71,15 +72,8 @@ ghostdriver.WebElementLocator = function(session) {
                 return null;
             }
 
-            // If the Element is found, create a relative WebElement Request Handler and return it
             if (typeof(findElementRes.status) !== "undefined" && findElementRes.status === 0) {
-                elementId = findElementRes.value["ELEMENT"];
-                // Create and Store a new WebElement if it doesn't exist yet
-                if (typeof(_elements[elementId]) === "undefined") {
-                    // TODO There is no need to store elements here and have them wrapped in WebElementReqHand
-                    _elements[elementId] = new ghostdriver.WebElementReqHand(elementId, _session);
-                }
-                return _elements[elementId];
+                return findElementRes.value; // N.B. this could be null, which is completely valid.  However this can currently be mistaken for an error
             }
         }
 
@@ -88,7 +82,6 @@ ghostdriver.WebElementLocator = function(session) {
     },
 
     _locateElements = function(locator, parent_element) {
-        // FIXME this gets any elements rather than just sub-elements
         var findElementsAtom = require("./webdriver_atoms.js").get("find_elements");
         if (locator && locator.using && locator.value &&         //< if well-formed input
             _supportedStrategies.indexOf(locator.using) >= 0) {  //< and if strategy is recognized
@@ -104,8 +97,6 @@ ghostdriver.WebElementLocator = function(session) {
                 console.error("Invalid locator received: "+JSON.stringify(locator));
                 return null;
             }
-
-            // TODO add request handlers for elements
 
             return findElementRes.value;
         }

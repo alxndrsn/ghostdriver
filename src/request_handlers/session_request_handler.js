@@ -111,7 +111,7 @@ console.log("Command: " + command);
                     return;
                 }
             }
-        } else if (req.urlParsed.file === _const.ELEMENT && req.method === "POST") {    //< ".../element"
+        } else if (req.urlParsed.file === _const.ELEMENT && req.urlParsed.chunks.length === 1 && req.method === "POST") {    //< ".../element"
             _postElementCommand(req, res);
             return;
         } else if (req.urlParsed.directory === _const.ELEMENT_DIR) {                    //< ".../element/:elementId" or ".../element/active"
@@ -561,7 +561,7 @@ console.log("..." + res.success);
         do {
             element = _locator.locateElement(JSON.parse(req.post));
             if (element) {
-                res.success(_session.getId(), element.getJSON());
+                res.success(_session.getId(), element);
                 return;
             }
         } while(searchStartTime + _session.getTimeout(_session.timeoutNames().IMPLICIT) >= new Date().getTime());

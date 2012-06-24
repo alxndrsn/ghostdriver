@@ -46,16 +46,29 @@ class RelativesSpec extends GebReportingSpec {
 	}
 
 	@Unroll
-	def 'elements should know their neighboring siblings'() {
+	def 'elements should know their preceding sibling'() {
 		expect:
-			find(e).previous().@id == previous && find(e).next().@id == next
+			find(e).previous().@id == previous
 		where:
-			e       | previous | next
-			GRANDAD | null     | null
-			DAD     | null     | null
-			ALICE   | null     | BOB
-			BOB     | ALICE    | CHARLIE
-			CHARLIE | BOB      | null
+			e       | previous
+			GRANDAD | null
+			DAD     | null
+			ALICE   | null
+			BOB     | ALICE
+			CHARLIE | BOB
+	}
+
+	@Unroll
+	def 'elements should know their following sibling'() {
+		expect:
+			find(e).next().@id == next
+		where:
+			e       | next
+			GRANDAD | null
+			DAD     | null
+			ALICE   | BOB
+			BOB     | CHARLIE
+			CHARLIE | null
 	}
 
 	@Unroll
@@ -69,6 +82,32 @@ class RelativesSpec extends GebReportingSpec {
 			ALICE   | KIDS - ALICE
 			BOB     | KIDS - BOB
 			CHARLIE | KIDS - CHARLIE
+	}
+
+	@Unroll
+	def 'elements should know all preceding siblings'() {
+		expect:
+			find(element).prevAll()*.@id == previousSiblings
+		where:
+			element | previousSiblings
+			GRANDAD | []
+			DAD     | []
+			ALICE   | []
+			BOB     | [ALICE]
+			CHARLIE | KIDS - CHARLIE
+	}
+
+	@Unroll
+	def 'elements should know all following siblings'() {
+		expect:
+			find(element).nextAll()*.@id == followingSiblings
+		where:
+			element | followingSiblings
+			GRANDAD | []
+			DAD     | []
+			ALICE   | KIDS - ALICE
+			BOB     | [CHARLIE]
+			CHARLIE | []
 	}
 }
 

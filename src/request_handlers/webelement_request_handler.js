@@ -41,6 +41,7 @@ ghostdriver.WebElementReqHand = function(id, session) {
         DISPLAYED       : "displayed",
         ATTRIBUTE       : "attribute",
         NAME            : "name",
+        ELEMENT         : "element",
         ELEMENTS        : "elements",
         TEXT            : "text",
         EQUALS          : "equals",
@@ -72,6 +73,9 @@ ghostdriver.WebElementReqHand = function(id, session) {
             return;
         } else if (req.urlParsed.file === _const.NAME && req.method === "GET") {
             _getNameCommand(req, res);
+            return;
+        } else if (req.urlParsed.file === _const.ELEMENT && req.method === "POST") {
+            _postElementCommand(req, res);
             return;
         } else if (req.urlParsed.file === _const.ELEMENTS && req.method === "POST") {
             _postElementsCommand(req, res);
@@ -225,6 +229,16 @@ ghostdriver.WebElementReqHand = function(id, session) {
         submitRes = _getSession().getCurrentWindow().evaluate(submitAtom, _getJSON());
 
         // TODO - Error handling based on the value of "submitRes"
+    },
+
+    _postElementCommand = function(req, res) {
+        // Search for WebElement relative to this element
+        // TODO should handle XPathLookupError - probably an exception will be thrown by the locator
+        console.log("_postElementCommand() :: locating element...");
+        var element = _locator.locateElement(JSON.parse(req.post), _getJSON());
+        console.log("_postElementCommand() :: got element (JSON string):" + JSON.stringify(element));
+
+        res.success(_session.getId(), element);
     },
 
     _postElementsCommand = function(req, res) {
