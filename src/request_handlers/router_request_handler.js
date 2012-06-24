@@ -81,10 +81,13 @@ ghostdriver.RouterReqHand = function() {
             if (typeof(e.handle) === "function") {
                 e.handle(res);
             } else {
-                // This should never happen, if we handle all the possible error scenario
-                res.statusCode = 404; //< "404 Not Found"
-                res.setHeader("Content-Type", "text/plain");
-                res.writeAndClose(e.name + " - " + e.message);
+console.log("res=" + res);
+                if(res && res.toString()!=="null") {
+                    // This should never happen, if we handle all the possible error scenario
+                    res.statusCode = 404; //< "404 Not Found"
+                    res.setHeader("Content-Type", "text/plain");
+                    res.writeAndClose(e.name + " - " + e.message);
+                }
             }
         }
     };
