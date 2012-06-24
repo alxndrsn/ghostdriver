@@ -2,6 +2,7 @@
 This file is part of the GhostDriver project from Neustar inc.
 
 Copyright (c) 2012, Ivan De Marino <ivan.de.marino@gmail.com> - Neustar inc.
+Copyright (c) 2012, Alex Anderson <@alxndrsn>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -55,10 +56,11 @@ ghostdriver.RouterReqHand = function() {
 //        console.log("Request.url => [" + req.method + "] " + req.url);
 
         try {
-            if (req.urlParsed.file === _const.STATUS) {                             // GET '/status'
+            if (req.urlParsed.file === _const.STATUS &&
+                req.urlParsed.chunks.length === 1) {                             // GET '/status'
                 _statusRH.handle(req, res);
-            } else if (req.urlParsed.file === _const.SESSION ||                     // POST '/session'
-                req.urlParsed.file === _const.SESSIONS ||                           // GET '/sessions'
+            } else if ((req.urlParsed.file === _const.SESSION && req.urlParsed.chunks.length === 1) || // POST '/session'
+                (req.urlParsed.file === _const.SESSIONS && req.urlParsed.chunks.length === 1) ||       // GET '/sessions'
                 req.urlParsed.directory === _const.SESSION_DIR) {                   // GET or DELETE '/session/:id'
                 _sessionManRH.handle(req, res);
             } else if (req.urlParsed.chunks[0] === _const.SESSION) {      // GET, POST or DELETE '/session/:id/...'

@@ -10,7 +10,7 @@ class EnabledSpec extends GebReportingSpec {
 	}
 
 	@Unroll
-	def 'enalbed and disabled elements should be identified correctly'() {
+	def 'enabled and disabled elements should be identified correctly'() {
 		expect:
 			$(selecter).disabled == !enabled
 		where:

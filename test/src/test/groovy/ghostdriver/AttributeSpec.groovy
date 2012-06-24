@@ -22,8 +22,6 @@ class AttributeSpec extends GebReportingSpec {
 			'invented' | 'ABC 123 four'
 	}
 
-	@Ignore // running this test has various nasty side effects - requesting /attribute/window
-	        // locks up the test suite, and another attribute (not sure which yet) kills ghostdriver
 	@Unroll('Fetching an attribute value called "#name" should be fully legal')
 	def 'attribute names that look like commands should be treated as attributes'() {
 		expect:

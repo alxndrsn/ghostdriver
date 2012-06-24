@@ -58,6 +58,10 @@ test {
 }
 
 task startJetty {
+// FIXME this seems to be run whether requested or not
+println '######################'
+println '### STARTING JETTY ###'
+println '######################'
     // TODO probably neater to convert this to use Gradle's JettyRun and JettyStop tasks
     def server = new Server(4567)
     def root = new ContextHandler(server, "/")
@@ -67,7 +71,11 @@ task startJetty {
 }
 
 task startGhostdriver() {
-    // start ghostdriver asynchronously and retain a handle for stopping it later
+// FIXME this seems to be run whether requested or not
+println '****************************'
+println '*** STARTING GHOSTDRIVER ***'
+println '****************************'
+    // start ghostdriver asynchronously and TODO: retain a handle for stopping it later
     if(!phantomExecutable) {
         System.err.println("You do not have 'phantomExecutable' defined in your gradle.properties.  Please set this.");
         System.exit(1)

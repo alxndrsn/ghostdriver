@@ -59,7 +59,10 @@ ghostdriver.WebElementReqHand = function(id, session) {
 
         // TODO lots to do...
 
-        if (req.urlParsed.file === _const.VALUE && req.method === "POST") {
+        if (req.urlParsed.chunks[0] === _const.ATTRIBUTE && req.method === "GET") {
+            _getAttributeCommand(req, res);
+            return;
+        } else if (req.urlParsed.file === _const.VALUE && req.method === "POST") {
             _valueCommand(req, res);
             return;
         } else if (req.urlParsed.file === _const.SUBMIT && req.method === "POST") {
@@ -67,9 +70,6 @@ ghostdriver.WebElementReqHand = function(id, session) {
             return;
         } else if (req.urlParsed.file === _const.DISPLAYED && req.method === "GET") {
             _getDisplayedCommand(req, res);
-            return;
-        } else if (req.urlParsed.chunks[0] === _const.ATTRIBUTE && req.method === "GET") {
-            _getAttributeCommand(req, res);
             return;
         } else if (req.urlParsed.file === _const.NAME && req.method === "GET") {
             _getNameCommand(req, res);

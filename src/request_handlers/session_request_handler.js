@@ -72,8 +72,21 @@ ghostdriver.SessionReqHand = function(session) {
 
         // console.log("Request => " + JSON.stringify(req, null, '  '));
 
-        // Handle "/url" GET and POST
-        if (req.urlParsed.file === _const.URL) {                                         //< ".../url"
+        if (req.urlParsed.file === _const.ELEMENT && req.urlParsed.chunks.length === 1 && req.method === "POST") {    //< ".../element"
+            _postElementCommand(req, res);
+            return;
+        } else if (req.urlParsed.directory === _const.ELEMENT_DIR) {                    //< ".../element/:elementId" or ".../element/active"
+            // TODO
+        } else if (req.urlParsed.chunks[0] === _const.ELEMENT) {                        //< ".../element/:elementId/COMMAND"
+            // Get the WebElementRH and, if found, re-route request to it
+            element = _locator.getElement(decodeURIComponent(req.urlParsed.chunks[1]));
+            if (element !== null) {
+                _protoParent.reroute.call(element, req, res, _const.ELEMENT_DIR + req.urlParsed.chunks[1]);
+            } else {
+                throw _errors.createInvalidReqVariableResourceNotFoundEH(req);
+            }
+            return;
+        } else if (req.urlParsed.file === _const.URL) {                                        //< ".../url"
             if (req.method === "GET") {
                 _getUrlCommand(req, res);
             } else if (req.method === "POST") {
@@ -111,20 +124,6 @@ console.log("Command: " + command);
                     return;
                 }
             }
-        } else if (req.urlParsed.file === _const.ELEMENT && req.urlParsed.chunks.length === 1 && req.method === "POST") {    //< ".../element"
-            _postElementCommand(req, res);
-            return;
-        } else if (req.urlParsed.directory === _const.ELEMENT_DIR) {                    //< ".../element/:elementId" or ".../element/active"
-            // TODO
-        } else if (req.urlParsed.chunks[0] === _const.ELEMENT) {                        //< ".../element/:elementId/COMMAND"
-            // Get the WebElementRH and, if found, re-route request to it
-            element = _locator.getElement(decodeURIComponent(req.urlParsed.chunks[1]));
-            if (element !== null) {
-                _protoParent.reroute.call(element, req, res, _const.ELEMENT_DIR + req.urlParsed.chunks[1]);
-            } else {
-                throw _errors.createInvalidReqVariableResourceNotFoundEH(req);
-            }
-            return;
         } else if (req.urlParsed.file === _const.FORWARD && req.method === "POST") {
             _forwardCommand(req, res);
             return;
